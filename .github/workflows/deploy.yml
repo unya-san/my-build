@@ -1,7 +1,7 @@
 name: Deploy Astro to GitHub Pages
 on:
   push:
-    branches:[main]
+    branches: [main]
   workflow_dispatch:
 
 permissions: 
@@ -39,12 +39,12 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
-deploy:
-  needs: build
-  runs-on: ubuntu-least
-  enviroment:
-    name: github-pages
-    url: ${{ steps.deployment.outputs.pages_url }}
+  deploy:
+    needs: build
+    runs-on: ubuntu-least
+    enviroment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.pages_url }}
 
   steps:
     - name: Deploy to GitHub Pages
