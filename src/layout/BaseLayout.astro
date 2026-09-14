@@ -8,6 +8,9 @@ const {
   title = "My Build",
   description = "Creative works"
 } = Astro.props;
+
+import Header from "../components/Header.astro"
+import Footer from "../components/Footer.astro"
 ---
 
 <!doctype html>
@@ -20,6 +23,8 @@ const {
     <meta name="description" content={description}/>
   </head>
   <body>
+    <Header />
     <slot />
+    <Footer />
   </body>
 </html>
