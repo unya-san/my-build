@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+header {
+  padding: 20px;
+  border-bottom: 1px solid #ccc;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40ppx 20px;
+}
+
+footer {
+  padding: 20px;
+  border-top: 1px solid #ccc;
+}
