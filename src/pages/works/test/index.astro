@@ -1,0 +1,14 @@
+---
+import BaseLayout from "../../../layout/BaseLayout.astro";
+---
+
+<BaseLayout title="Test Game" description="テストページ">
+  <h1>Test Game</h1>
+  <p>公開テスト</p>
+  <iframe 
+    src="{`${import.meta.env.BASE_URL}game/test`}"
+    title="Test Game"
+    width="800"
+    height="600"
+    ></iframe>
+</BaseLayout> 
