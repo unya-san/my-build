@@ -4,5 +4,5 @@ import { defineConfig } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://unya-san.github.io',
-  base: '/my-build/'
+  base: '/my-build'
 });
