@@ -1,19 +1,38 @@
 ---
 interface Props {
   title?: string;
+  description?: string;
   category?: string;
-  url?: string;
+  thechnology: string;
+  href?: string;
+  thumbnail?: string;
 }
 
 const {
-  title = "My Build",
-  category = "JS/HTML",
-  url = `${import.meta.env.BASE_URL}/works/`
+  title,
+  description,
+  category,
+  thechnology,
+  href,
+  thumbnail,
+
 } = Astro.props;
 
 ---
-<body>
-  <title>{title}</title>
-  <meta name="category" content={category}/>
-  <meta name="url" content={url}/>
-</body>
+
+<article class="work-card">
+  <a href={href}>
+    {thumbnail && (
+      <img src={thumbnail} alt={title}/>
+    )}
+
+    <div class="work-card-content">
+      <p class="work-card-category">{category}</p>
+      <h2>{title}</h2>
+      <p>{description}</p>
+      <p class="work-card-thechnology">
+        {thechnology}
+      </p>
+      </div>
+  </a>
+</article>
