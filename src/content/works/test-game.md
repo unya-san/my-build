@@ -1,8 +1,8 @@
 ---
 title: "test game"
 description: "test"
-categoory: "game"
+category: "game"
 technology: "HTML/js"
 thumbnail: "/images/test-game.png"
-gamePath: "/games/test/"
+gamePath: "games/test/"
 ---
