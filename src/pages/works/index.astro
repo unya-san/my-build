@@ -5,6 +5,7 @@ import { getCollection } from "astro:content";
 import { undefined } from "astro:schema";
 
 const works = await getCollection("works");
+// const work = works[0]
 ---
 
 <BaseLayout   
@@ -14,28 +15,31 @@ const works = await getCollection("works");
   <h1>Works</h1>
   <p>作品紹介</p>
 
-  <section class="works-list">
+  <section>
     <p>作品数：{works.length}</p>
     {works.map((work)=>{
-      <div>
-        <h2>{work.data.title}</h2>
-        <p>{work.data.description}</p>
-        <p>{work.data.category}</p>
-        <p>{work.data.technology}</p>
-      </div>
-      // <WorkCard
-      // title={work.data.title}
-      // description={work.data.description}
-      // category={work.data.category}
-      // thechnology={work.data.technology}
-      // href={`${import.meta.env.BASE_URL}works/${work.id}/`}
-      // thumbnail={
-      //   work.data.thumbnail
-      //     ? `${import.meta.env.BASE_URL}${work.data.thumbnail}`
-      //     : ""
-      // }
-      // />
+      return(
+      //   <div>
+      //     <p>作品ID:{work.id}</p>
+      //     <p>Title:{work.data.title}</p>
+      //     <p>説明:{work.data.description}</p>
+      //     <p>カテゴリ:{work.data.category}</p>
+      //     <p>技術:{work.data.technology}</p>
+      // </div>
+      // )
+      <WorkCard
+      title={work.data.title}
+      description={work.data.description}
+      category={work.data.category}
+      thechnology={work.data.technology}
+      href={`${import.meta.env.BASE_URL}works/${work.id}/`}
+      thumbnail={
+        work.data.thumbnail
+          ? `${import.meta.env.BASE_URL}${work.data.thumbnail}`
+          : ""
+      }
+      />
+    )
     })}
   </section>
-
 </BaseLayout> 
