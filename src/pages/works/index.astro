@@ -20,12 +20,12 @@ const works = await getCollection("works");
       title={work.data.title}
       description={work.data.description}
       category={work.data.category}
-      thechnology={work.data.thechnology}
-      href={`${import.meta.env.BASE_URL}works/${work.id}`}
+      thechnology={work.data.technology}
+      href={`${import.meta.env.BASE_URL}works/${work.id}/`}
       thumbnail={
         work.data.thumbnail
           ? `${import.meta.env.BASE_URL}${work.data.thumbnail}`
-          : undefined
+          : ""
       }
       />
     })}
