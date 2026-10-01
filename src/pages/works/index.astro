@@ -15,18 +15,9 @@ const works = await getCollection("works");
   <h1>Works</h1>
   <p>作品紹介</p>
 
-  <section>
-    <p>作品数：{works.length}</p>
+  <section class="works-list">
     {works.map((work)=>{
       return(
-      //   <div>
-      //     <p>作品ID:{work.id}</p>
-      //     <p>Title:{work.data.title}</p>
-      //     <p>説明:{work.data.description}</p>
-      //     <p>カテゴリ:{work.data.category}</p>
-      //     <p>技術:{work.data.technology}</p>
-      // </div>
-      // )
       <WorkCard
       title={work.data.title}
       description={work.data.description}

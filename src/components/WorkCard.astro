@@ -1,4 +1,6 @@
 ---
+import "../styles/WorkCard.css";
+
 interface Props {
   title?: string;
   description?: string;
@@ -20,10 +22,16 @@ const {
 ---
 
 <article class="work-card">
-  <a href={href}>
-    {thumbnail && (
-      <img src={thumbnail} alt={title}/>
-    )}
+  <a href={href} class="work-card-link">
+    <div class="work-card-thumbnail">
+      {thumbnail ? (
+        <img src={thumbnail} alt={title}/>
+      ) : (
+        <div class="work-card-no-image">
+          NO Image
+        </div>
+      )}
+    </div>
 
     <div class="work-card-content">
       <p class="work-card-category">{category}</p>
@@ -34,8 +42,4 @@ const {
       </p>
       </div>
   </a>
-  <!-- <h2>{title}</h2>
-  <p>{description}</p>
-  <p>{thechnology}</p>
-  <a href={href}>詳細</a> -->
 </article>
