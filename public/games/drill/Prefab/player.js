@@ -1,5 +1,5 @@
-import { GameObject } from "./unengin/GameObject.js"
-import { Input } from "./unengin/Input.js"
+import { GameObject } from "../unengin/GameObject.js"
+import { Input } from "../unengin/Input.js"
 
 export class Player extends GameObject {
   constructor(x,y){
@@ -31,6 +31,8 @@ export class Player extends GameObject {
         this.speed = 0
       }
     }
+
+    this.transform.y += this.speed/100;
   }
 
   draw(ctx, camera){

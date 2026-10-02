@@ -10,4 +10,9 @@ export class Camera {
       y:y-this.y
     };
   }
+
+  setPos(x,y){
+    this.x=x;
+    this.y=y;
+  }
 }
