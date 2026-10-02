@@ -8,31 +8,31 @@ import { WallGenerator } from "./System/WallGenerator.js"
 //GameLoop
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-console.log("A")
 
 Input.initialize();
-console.log("B")
 
 const scene = new Scene();
 const camera = new Camera();
 const player = new Player(400,100);
-console.log("C")
+console.log("A")
 
 scene.add(player);
+console.log("B")
 
 const wallGenerator = new WallGenerator(scene);
+console.log("C")
 for ( let i=0; i<50; i++){
+  console.log("D")
   wallGenerator.generate();
 }
-console.log("D")
-
-let lastTime = performance.now();
-
-let depthLevel = 0;
 console.log("E")
 
-function gameLoop(currentTime){
+let lastTime = performance.now();
 console.log("F")
+
+let depthLevel = 0;
+
+function gameLoop(currentTime){
   const deltaTime = (currentTime - lastTime) / 1000;
   lastTime = currentTime;
 
