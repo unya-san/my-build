@@ -1,25 +1,22 @@
-console.log("A")
 import { Player } from "./Prefab/player.js"
-console.log("B")
 import { Input } from "./unengin/Input.js"
-console.log("C")
 import { Scene } from "./unengin/Scene.js"
-console.log("D")
 import { Camera } from "./unengin/Camera.js"
-console.log("E")
 import { WallGenerator } from "./System/WallGenerator.js"
-console.log("F")
 
 
 //GameLoop
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+console.log("A")
 
 Input.initialize();
+console.log("B")
 
 const scene = new Scene();
 const camera = new Camera();
 const player = new Player(400,100);
+console.log("C")
 
 scene.add(player);
 
@@ -27,12 +24,15 @@ const wallGenerator = new WallGenerator(scene);
 for ( let i=0; i<50; i++){
   wallGenerator.generate();
 }
+console.log("D")
 
 let lastTime = performance.now();
 
 let depthLevel = 0;
+console.log("E")
 
 function gameLoop(currentTime){
+console.log("F")
   const deltaTime = (currentTime - lastTime) / 1000;
   lastTime = currentTime;
 
