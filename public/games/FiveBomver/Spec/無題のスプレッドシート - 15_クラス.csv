@@ -1,0 +1,8 @@
+ID,Title,description
+1,Player,Playerに関する動作クラス
+2,Host,Hostに関する動作クラス
+3,GameLoop,ゲームループに関するクラス
+4,Draw,ゲームの描画に関するクラス
+5,Connect,参加者の通信に関するクラス
+6,Room,部屋に関するクラス
+7,GameManager,ゲーム進行に関するクラス

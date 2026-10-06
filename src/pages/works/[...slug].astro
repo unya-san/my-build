@@ -19,6 +19,9 @@ export async function getStaticPaths () {
 
 const { work } = Astro.props;
 const { Content } = await render(work);
+const baseUrl = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 ---
 
 <BaseLayout
@@ -35,10 +38,11 @@ const { Content } = await render(work);
     <section>
       <h2>game</h2>
       <iframe
-        src={`${import.meta.env.BASE_URL}${work.data.gamePath}index.html`}
+        src={`${baseUrl}${work.data.gamePath}index.html`}
         title={work.data.title}
         width="800"
         height="600"
+        style="width: 100%; max-width: 800px; height: 600px; border: 0;"
         ></iframe>
     </section>
   )}

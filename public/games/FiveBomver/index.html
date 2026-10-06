@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f3e9">
+    <meta
+      name="description"
+      content="5人で順番に答える、ファイブボンバーのブラウザー版です。"
+    >
+    <title>ファイブボンバー</title>
+    <link rel="stylesheet" href="./style.css">
+    <script type="module" src="./main.js"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="ファイブボンバー">
+          <span class="brand-mark" aria-hidden="true">爆</span>
+          <span>FIVE BOMBER</span>
+        </a>
+        <span class="topbar-note">みんなでつなぐ、5人クイズ</span>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">TEAM QUIZ PARTY</p>
+          <h1 id="page-title">ファイブボンバー</h1>
+          <p class="hero-copy">ひらめきをリレーして、爆弾をゴールまで運ぼう！</p>
+        </div>
+        <div class="hero-bomb" aria-hidden="true">💣</div>
+      </section>
+
+      <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+      <section id="lobby-screen" class="panel" aria-labelledby="lobby-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">01 / LOBBY</p>
+            <h2 id="lobby-title">ロビー</h2>
+          </div>
+          <span id="room-status" class="status-pill">部屋未作成</span>
+        </div>
+
+        <div class="lobby-grid">
+          <section class="setup-card" aria-labelledby="setup-title">
+            <h3 id="setup-title">ホスト設定</h3>
+            <label class="field">
+              <span>チーム数</span>
+              <select id="team-count">
+                <option value="1">1チーム（5人）</option>
+                <option value="2">2チーム（10人）</option>
+              </select>
+            </label>
+            <div class="field-row">
+              <label class="field">
+                <span>制限時間（秒）</span>
+                <input id="timer-setting" type="number" min="15" max="180" step="15" value="60">
+              </label>
+              <label class="field">
+                <span>正解時の回復（秒）</span>
+                <input id="recovery-setting" type="number" min="0" max="15" step="1" value="3">
+              </label>
+            </div>
+            <label class="field">
+              <span>部屋パスワード（任意）</span>
+              <input id="room-password" type="password" maxlength="32" autocomplete="new-password" placeholder="設定しない場合は空欄">
+            </label>
+            <button id="create-room" class="button button-primary button-wide" type="button">部屋を作成</button>
+            <div id="room-code-card" class="room-code-card" hidden>
+              <span>ルームコード</span>
+              <strong id="room-code"></strong>
+              <button id="copy-room-code" class="button button-small" type="button">コピー</button>
+            </div>
+          </section>
+
+          <section class="join-card" aria-labelledby="join-title">
+            <h3 id="join-title">プレイヤー参加</h3>
+            <p class="muted">作成した部屋に参加するプレイヤーを登録します。</p>
+            <form id="join-form">
+              <label class="field">
+                <span>ルームコード</span>
+                <input id="join-code" type="text" maxlength="4" autocomplete="off" placeholder="例：AB12" required>
+              </label>
+              <label class="field">
+                <span>パスワード</span>
+                <input id="join-password" type="password" maxlength="32" autocomplete="off" placeholder="パスワードがある場合">
+              </label>
+              <label class="field">
+                <span>プレイヤー名</span>
+                <input id="player-name" type="text" maxlength="16" autocomplete="off" placeholder="名前を入力" required>
+              </label>
+              <label class="field">
+                <span>参加チーム</span>
+                <select id="join-team" disabled>
+                  <option value="0">チームA</option>
+                </select>
+              </label>
+              <button id="join-room" class="button button-secondary button-wide" type="submit" disabled>部屋に参加</button>
+            </form>
+          </section>
+        </div>
+
+        <section class="roster-section" aria-labelledby="roster-title">
+          <div class="roster-heading">
+            <div>
+              <h3 id="roster-title">参加メンバー</h3>
+              <p class="muted">各チーム5人。カードをドラッグして順番やチームを変更できます。</p>
+            </div>
+            <span id="player-count" class="count-pill">0 / 5 人</span>
+          </div>
+          <div id="team-rosters" class="team-rosters"></div>
+        </section>
+
+        <div class="lobby-footer">
+          <p class="connection-note">
+            この版はブラウザー内で動くローカル版です。別端末間のリアルタイム通信にはWebSocketサーバーが必要です。
+          </p>
+          <button id="start-game" class="button button-primary" type="button" disabled>準備を確認してゲーム開始</button>
+        </div>
+      </section>
+
+      <section id="game-screen" class="panel game-panel" aria-labelledby="game-title" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">02 / GAME</p>
+            <h2 id="game-title">クイズタイム</h2>
+          </div>
+          <div class="game-badges">
+            <span id="active-team" class="status-pill">チームA</span>
+            <span id="round-number" class="count-pill">1問目</span>
+          </div>
+        </div>
+
+        <div class="game-score-row">
+          <div>
+            <span class="muted">チームスコア</span>
+            <strong><span id="team-score">0</span><small> pt</small></strong>
+          </div>
+          <div class="timer-box" aria-live="polite">
+            <span class="muted">のこり時間</span>
+            <strong><span id="timer-value">60</span><small> 秒</small></strong>
+          </div>
+        </div>
+        <div class="timer-track" role="progressbar" aria-label="残り時間" aria-valuemin="0" aria-valuemax="60" aria-valuenow="60">
+          <div id="timer-bar" class="timer-bar"></div>
+        </div>
+
+        <div class="question-card">
+          <label class="field">
+            <span>問題（ホストが入力）</span>
+            <input id="question-input" type="text" maxlength="120" placeholder="例：赤い食べ物といえば？">
+          </label>
+          <p id="question-display" class="question-display">問題を入力して、クイズを始めよう</p>
+        </div>
+
+        <section class="players-board" aria-labelledby="players-title">
+          <div class="board-heading">
+            <h3 id="players-title">回答リレー</h3>
+            <p id="turn-message" class="muted">準備ができたらクイズを開始してください。</p>
+          </div>
+          <div id="bomb-track" class="bomb-track" aria-label="5人の回答順"></div>
+          <div id="answer-list" class="answer-list" aria-label="入力済みの正解"></div>
+        </section>
+
+        <section class="host-controls" aria-labelledby="host-controls-title">
+          <h3 id="host-controls-title">ホスト操作</h3>
+          <div id="before-round-controls" class="control-row">
+            <button id="begin-round" class="button button-primary" type="button">クイズ開始</button>
+            <button id="back-to-lobby" class="button button-quiet" type="button">ロビーへ戻る</button>
+          </div>
+          <div id="answer-controls" class="answer-controls" hidden>
+            <label class="field answer-field">
+              <span>正解した回答（メモ）</span>
+              <input id="answer-input" type="text" maxlength="80" placeholder="プレイヤーの回答を入力">
+            </label>
+            <div class="control-row">
+              <button id="mark-correct" class="button button-correct" type="button">○ 正解</button>
+              <button id="mark-incorrect" class="button button-incorrect" type="button">× 不正解</button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="result-screen" class="panel result-panel" aria-labelledby="result-title" hidden>
+        <p class="eyebrow">03 / RESULT</p>
+        <div id="result-icon" class="result-icon" aria-hidden="true">🎉</div>
+        <h2 id="result-title">クリア！</h2>
+        <p id="result-message" class="result-message"></p>
+        <div class="result-score"><span>チームスコア</span><strong><span id="result-score">0</span> pt</strong></div>
+        <div class="result-actions">
+          <button id="continue-game" class="button button-primary" type="button">同じチームで次の問題</button>
+          <button id="next-team" class="button button-secondary" type="button" hidden>次のチームへ</button>
+          <button id="result-to-lobby" class="button button-quiet" type="button">ロビーへ戻る</button>
+        </div>
+      </section>
+
+      <footer class="app-footer">
+        <span>FIVE BOMBER</span>
+        <span>5人でつなぐクイズリレー</span>
+      </footer>
+    </main>
+  </body>
+</html>
