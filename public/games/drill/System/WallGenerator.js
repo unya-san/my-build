@@ -11,8 +11,8 @@ export class WallGenerator {
     this.nextY = 0;
 
     this.centerX = 400;
-    this.tunnelWidth = 500;
-    this.MaxTunnelWidth = 600;
+    this.tunnelWidth = 450;
+    this.MaxTunnelWidth = 500;
     this.MinTunnelWidth = 400;
 
     this.moveState = MoveState.RIGHT;
@@ -32,8 +32,8 @@ export class WallGenerator {
     this.updateTunnelWidthState()
     this.updateTunnelWidth();
 
-    this.leftWallX = this.centerX - this.tunnelWidth/2
-    this.rightWallX = this.centerX + this.tunnelWidth/2
+    this.leftWallX = this.centerX - this.tunnelWidth / 2
+    this.rightWallX = this.centerX + this.tunnelWidth / 2
 
     const leftWall = new Wall(
       this.leftWallX,
@@ -58,60 +58,60 @@ export class WallGenerator {
     this.nextY += this.wallHeight
   }
 
-  setTunnelWidthLevel(max,min){
+  setTunnelWidthLevel(max, min) {
     this.MaxTunnelWidth = max;
     this.MinTunnelWidth = min;
   }
 
-  updateMoveState(){
+  updateMoveState() {
     this.moveCount++;
-    if(this.moveCount < this.minMoveCount){
+    if (this.moveCount < this.minMoveCount) {
       return;
     }
 
-    if(Math.random() < this.changeDirection){
+    if (Math.random() < this.changeDirection) {
       this.moveState *= -1;
       this.moveCount = 0;
     }
   }
-  updateCenterX(){
-    let moveAmount = Math.random(0,1)*20;
+  updateCenterX() {
+    let moveAmount = Math.random(0, 1) * 20;
     this.centerX += this.moveState * moveAmount;
-    if( (this.centerX - this.tunnelWidth/2) < 100 ){
-      this.centerX = 100 + this.tunnelWidth/2
-    } else if ( (this.centerX + this.tunnelWidth/2) > 700 ){
-      this.centerX = 700 - this.tunnelWidth/2
+    if ((this.centerX - this.tunnelWidth / 2) < 100) {
+      this.centerX = 100 + this.tunnelWidth / 2
+    } else if ((this.centerX + this.tunnelWidth / 2) > 700) {
+      this.centerX = 700 - this.tunnelWidth / 2
     }
   }
 
-  updateTunnelWidthState(){
+  updateTunnelWidthState() {
     this.depthCount++;
-    if(this.depthCount < this.minDepthCount){
+    if (this.depthCount < this.minDepthCount) {
       return;
     }
 
-    if(Math.random() < this.changeWidth){
+    if (Math.random() < this.changeWidth) {
       this.tunnelWidthState *= -1;
       this.depthCount = 0;
     }
   }
-  updateTunnelWidth(){
-    let widthAmount = Math.random(0,1)*20;
+  updateTunnelWidth() {
+    let widthAmount = Math.random(0, 1) * 20;
     this.tunnelWidth += this.tunnelWidthState * widthAmount;
-    if( this.tunnelWidth < this.MinTunnelWidth ){
+    if (this.tunnelWidth < this.MinTunnelWidth) {
       this.tunnelWidth = this.MinTunnelWidth
-    } else if ( this.tunnelWidth > this.MaxTunnelWidth ){
+    } else if (this.tunnelWidth > this.MaxTunnelWidth) {
       this.tunnelWidth = this.MaxTunnelWidth
     }
   }
 }
 
 const MoveState = {
-  LEFT:-1,
-  RIGHT:1
+  LEFT: -1,
+  RIGHT: 1
 }
 
 const TunnelWidthState = {
-  SHORT:-1,
-  WIDE:1
+  SHORT: -1,
+  WIDE: 1
 }
