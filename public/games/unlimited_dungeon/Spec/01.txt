@@ -1,0 +1,8 @@
+Abstract
+title,無限ダンジョン
+description,無限に続く地下ダンジョンに挑む勇者。敵のレベル上昇についていけるかそれとも力尽きるか
+genre,ローグライク：ランダムダンジョン
+player,1人
+control,keyborad
+same game,風来の試練；ラミィの大冒険
+game level,hard

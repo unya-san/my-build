@@ -1,0 +1,15 @@
+Player
+begin HP,10
+begin Attack,5
+touch,100
+auto heal,1turn 1HP heal
+nomal attack range,1
+angle,8direction
+move,WASD
+change angle,Z + move
+move speed up,Shift + move
+attack,Space
+inventry,I
+select,Enter
+item get,on item
+backpack limit,30

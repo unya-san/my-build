@@ -1,0 +1,9 @@
+Enemy
+enemy kind,20
+enemy color variation,4
+total enemy kind,80=20*4
+1 room enemy kind,5~10
+1 room enemy num,8~100
+item drop,0~1
+enemy status reference,databace(json)
+

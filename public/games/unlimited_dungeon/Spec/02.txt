@@ -1,0 +1,14 @@
+MAP
+cell,32*32pix
+map size,16*16cell ~ 64*64cell
+texsture,wall/ground/in_wall
+map gen,random room/random branch
+room num,5 ~ 10
+room size,4*4cell ~ 8*8cell
+room shape,Rectangle
+branch size,1*1cell
+branch corner,max 2 corner
+branch connect room,2 ~ 4
+view small map,右上
+small map highlight,部屋に入ると地図が更新される
+item spown,5~15

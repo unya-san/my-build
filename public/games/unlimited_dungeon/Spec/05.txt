@@ -1,0 +1,7 @@
+Item
+item kind,Book/Sorad/Arrow/Harb/Touch/Armer/Shild/Spear/Card
+common command,Put/Use/Throw/Pick
+Book command,Read
+Weapon command,Set/Unset
+item effect reference,databace(json)
+each item kind,10

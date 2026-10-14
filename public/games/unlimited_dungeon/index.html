@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#10151b">
+    <title>無限ダンジョン</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="title-bar">
+        <div>
+          <p class="eyebrow">ENDLESS ROGUELIKE</p>
+          <h1>無限ダンジョン</h1>
+        </div>
+        <p id="floor-label" class="floor-label">第 1 階層</p>
+      </header>
+      <section class="game-layout" aria-label="ゲーム画面">
+        <div class="stage">
+          <canvas id="game-canvas" width="960" height="640" aria-label="ダンジョン"></canvas>
+          <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true"></div>
+        </div>
+        <aside class="sidebar">
+          <section class="panel">
+            <h2>冒険者</h2>
+            <div class="stat-line"><span>HP</span><strong id="hp-stat"></strong></div>
+            <div class="meter"><span id="hp-meter"></span></div>
+            <div class="stat-line"><span>松明</span><strong id="torch-stat"></strong></div>
+            <div class="meter torch-meter"><span id="torch-meter"></span></div>
+            <div class="stat-line"><span>攻撃力</span><strong id="attack-stat"></strong></div>
+            <div class="stat-line"><span>防御力</span><strong id="defense-stat"></strong></div>
+            <div class="stat-line"><span>経験値</span><strong id="exp-stat"></strong></div>
+            <div class="stat-line"><span>レベル</span><strong id="level-stat"></strong></div>
+            <div class="equipment" id="equipment-stat"></div>
+          </section>
+          <section class="panel">
+            <h2>持ち物 <span id="bag-count"></span></h2>
+            <ul id="quick-items" class="quick-items"></ul>
+            <button id="inventory-button" class="action-button">持ち物を開く <kbd>I</kbd></button>
+          </section>
+          <section class="panel log-panel">
+            <h2>冒険の記録</h2>
+            <ol id="message-log" aria-live="polite"></ol>
+          </section>
+        </aside>
+      </section>
+      <footer class="help-bar">
+        <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移動</span>
+        <span><kbd>Q</kbd><kbd>E</kbd><kbd>C</kbd> 斜め移動</span>
+        <span><kbd>Z</kbd> 左下移動</span>
+        <span><kbd>X</kbd>＋方向キー 向き変更</span>
+        <span><kbd>Space</kbd> 攻撃</span>
+        <span><kbd>I</kbd> 持ち物</span>
+        <span><kbd>Shift</kbd> 高速移動</span>
+        <button id="new-game-button" class="text-button">新しい冒険</button>
+      </footer>
+    </main>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
