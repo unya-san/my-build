@@ -1,8 +1,8 @@
 import { Transform } from './Transform.js';
 
 export class GameObject {
-  constructor(x,y) {
-    this.transform = new Transform(x,y);
+  constructor(x, y, tag = "None") {
+    this.transform = new Transform(x, y);
 
     this.width = 50;
     this.height = 50;
@@ -11,6 +11,8 @@ export class GameObject {
     this.velocityY = 0;
 
     this.active = true;
+
+    this.tag = tag;
   }
 
   update(deltaTime) {
@@ -23,5 +25,9 @@ export class GameObject {
 
   destroy() {
     this.active = false;
+  }
+
+  setTag(t) {
+    this.tag = t;
   }
 }
