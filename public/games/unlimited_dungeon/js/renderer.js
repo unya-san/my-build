@@ -47,24 +47,23 @@ export class Renderer {
   }
 
   #cameraOrigin(state) {
-    const visibleColumns = Math.ceil(this.canvas.width / CONFIG.tileSize);
-    const visibleRows = Math.ceil(this.canvas.height / CONFIG.tileSize);
     return {
-      x: Math.max(0, Math.min(state.dungeon.size - visibleColumns, state.player.x - Math.floor(visibleColumns / 2))),
-      y: Math.max(0, Math.min(state.dungeon.size - visibleRows, state.player.y - Math.floor(visibleRows / 2))),
+      x: state.player.x + 0.5 - this.canvas.width / (2 * CONFIG.tileSize),
+      y: state.player.y + 0.5 - this.canvas.height / (2 * CONFIG.tileSize),
     };
   }
 
   #drawMap(state, origin) {
     const { context: ctx } = this;
     const { dungeon } = state;
-    for (let screenY = 0; screenY <= this.canvas.height / CONFIG.tileSize; screenY += 1) {
-      for (let screenX = 0; screenX <= this.canvas.width / CONFIG.tileSize; screenX += 1) {
-        const x = origin.x + screenX;
-        const y = origin.y + screenY;
-        if (x >= dungeon.size || y >= dungeon.size) continue;
-        const px = screenX * CONFIG.tileSize;
-        const py = screenY * CONFIG.tileSize;
+    const firstX = Math.max(0, Math.floor(origin.x));
+    const lastX = Math.min(dungeon.size, Math.ceil(origin.x + this.canvas.width / CONFIG.tileSize));
+    const firstY = Math.max(0, Math.floor(origin.y));
+    const lastY = Math.min(dungeon.size, Math.ceil(origin.y + this.canvas.height / CONFIG.tileSize));
+    for (let y = firstY; y < lastY; y += 1) {
+      for (let x = firstX; x < lastX; x += 1) {
+        const px = (x - origin.x) * CONFIG.tileSize;
+        const py = (y - origin.y) * CONFIG.tileSize;
         if (!dungeon.discovered[y][x]) {
           if (this.#nearPlayer(x, y, state.player)) this.#drawTile(ctx, px, py, CONFIG.colors.explored);
           continue;

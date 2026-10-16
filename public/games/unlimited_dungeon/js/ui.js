@@ -18,6 +18,7 @@ export class GameUI {
       log: document.querySelector("#message-log"),
       overlay: document.querySelector("#overlay"),
       floor: document.querySelector("#floor-label"),
+      stage: document.querySelector(".stage"),
     };
     this.onAction = () => {};
     this.onClose = () => {};
@@ -58,12 +59,28 @@ export class GameUI {
 
   log(message) {
     this.messages.push(message);
+    const line = document.createElement("li");
+    line.textContent = message;
+    this.elements.log.append(line);
+    while (this.elements.log.children.length > 30) this.elements.log.firstElementChild.remove();
     this.messages = this.messages.slice(-30);
-    this.elements.log.replaceChildren(...this.messages.map((text) => {
-      const line = document.createElement("li");
-      line.textContent = text;
-      return line;
-    }));
+    this.elements.log.scrollTop = this.elements.log.scrollHeight;
+  }
+
+  clearLog() {
+    this.messages = [];
+    this.elements.log.replaceChildren();
+    this.elements.log.scrollTop = 0;
+  }
+
+  shake(kind) {
+    const className = kind === "hit" ? "shake-hit" : "shake-attack";
+    this.elements.stage.classList.remove("shake-attack", "shake-hit");
+    void this.elements.stage.offsetWidth;
+    this.elements.stage.classList.add(className);
+    this.elements.stage.addEventListener("animationend", () => {
+      this.elements.stage.classList.remove(className);
+    }, { once: true });
   }
 
   openInventory(player, actions) {

@@ -10,15 +10,16 @@ export class CombatSystem {
     this.onGameOver = onGameOver;
   }
 
-  attack() {
+  async attack() {
     const { player, enemies } = this.state;
+    this.ui.shake("attack");
     const weapon = player.equipment.weapon;
     const isBow = weapon?.kind === "Bow";
     const arrow = isBow ? player.inventory.find((item) => item.kind === "Arrow" && item.quantity > 0) : null;
     if (isBow && !arrow) {
       this.ui.log("矢がなく、弓を射てない。");
       player.turns += 1;
-      this.finishTurn();
+      await this.finishTurn();
       return;
     }
     if (isBow) this.#consumeArrow(arrow);
@@ -30,10 +31,11 @@ export class CombatSystem {
       const damage = Math.max(1, player.attack + (arrow?.power ?? 0) + randomDamage() - target.defense);
       target.hp -= damage;
       this.ui.log(`${target.name}に${damage}のダメージ。`);
+      this.ui.update(this.state);
       if (target.hp <= 0) this.defeat(target);
     }
     player.turns += 1;
-    this.finishTurn();
+    await this.finishTurn();
   }
 
   #findTarget(range) {
@@ -48,7 +50,8 @@ export class CombatSystem {
     return null;
   }
 
-  throwCard(card) {
+  async throwCard(card) {
+    this.ui.shake("attack");
     const target = this.#findTarget(CONFIG.cardRange);
     if (!target) {
       this.ui.log(`${card.name}を投げたが、敵には当たらなかった。`);
@@ -66,7 +69,7 @@ export class CombatSystem {
       if (target.hp <= 0) this.defeat(target);
     }
     this.state.player.turns += 1;
-    this.finishTurn();
+    await this.finishTurn();
   }
 
   #consumeArrow(arrow) {
@@ -97,11 +100,13 @@ export class CombatSystem {
     return baseChance;
   }
 
-  finishTurn() {
+  async finishTurn() {
     const { player } = this.state;
     player.hp = Math.min(player.maxHp, player.hp + CONFIG.healPerTurn);
     player.torch = Math.max(0, player.torch - CONFIG.torchDrainPerTurn);
-    this.#moveEnemies();
+    this.ui.update(this.state);
+    await this.#pause();
+    await this.#moveEnemies();
     if (!player.alive || player.torch <= 0) {
       this.state.ended = true;
       this.onGameOver(player.alive ? "松明の火が消えた。" : "HPが尽きた。");
@@ -120,13 +125,15 @@ export class CombatSystem {
     this.ui.log(`レベル${player.level}に成長！最大HP・攻撃力が上がった。`);
   }
 
-  #moveEnemies() {
+  async #moveEnemies() {
     const { player, dungeon, enemies } = this.state;
     for (const enemy of [...enemies]) {
       if (enemy.poisonTurns > 0) {
         enemy.hp -= enemy.poisonDamage;
         enemy.poisonTurns -= 1;
         this.ui.log(`${enemy.name}は毒で${enemy.poisonDamage}のダメージを受けた。`);
+        this.ui.update(this.state);
+        await this.#pause();
         if (enemy.hp <= 0) {
           this.defeat(enemy);
           continue;
@@ -142,6 +149,10 @@ export class CombatSystem {
         const damage = Math.max(1, enemy.attack - player.defense);
         player.hp -= damage;
         this.ui.log(`${enemy.name}の攻撃。${damage}のダメージを受けた。`);
+        this.ui.shake("hit");
+        this.ui.update(this.state);
+        await this.#pause();
+        if (!player.alive) break;
         continue;
       }
       if (Math.max(Math.abs(dx), Math.abs(dy)) > 8) continue;
@@ -169,5 +180,9 @@ export class CombatSystem {
         enemy.y = nextY;
       }
     }
+  }
+
+  #pause() {
+    return new Promise((resolve) => setTimeout(resolve, CONFIG.combatMessageDelay));
   }
 }

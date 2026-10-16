@@ -19,6 +19,10 @@
       <section class="game-layout" aria-label="ゲーム画面">
         <div class="stage">
           <canvas id="game-canvas" width="960" height="640" aria-label="ダンジョン"></canvas>
+          <section class="panel log-panel" aria-label="冒険の記録">
+            <h2>冒険の記録</h2>
+            <ol id="message-log" aria-live="polite"></ol>
+          </section>
           <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true"></div>
         </div>
         <aside class="sidebar">
@@ -39,16 +43,11 @@
             <ul id="quick-items" class="quick-items"></ul>
             <button id="inventory-button" class="action-button">持ち物を開く <kbd>I</kbd></button>
           </section>
-          <section class="panel log-panel">
-            <h2>冒険の記録</h2>
-            <ol id="message-log" aria-live="polite"></ol>
-          </section>
         </aside>
       </section>
       <footer class="help-bar">
         <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移動</span>
-        <span><kbd>Q</kbd><kbd>E</kbd><kbd>C</kbd> 斜め移動</span>
-        <span><kbd>Z</kbd> 左下移動</span>
+        <span><kbd>Q</kbd><kbd>E</kbd><kbd>Z</kbd><kbd>C</kbd> 斜め移動</span>
         <span><kbd>X</kbd>＋方向キー 向き変更</span>
         <span><kbd>Space</kbd> 攻撃</span>
         <span><kbd>I</kbd> 持ち物</span>

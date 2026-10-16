@@ -30,6 +30,7 @@ export class InventorySystem {
   }
 
   open() {
+    if (this.state.turnBusy) return;
     this.state.inventoryOpen = true;
     this.ui.openInventory(this.state.player, {
       onAction: (command, index) => this.execute(command, index),
@@ -46,21 +47,30 @@ export class InventorySystem {
     if (commandByKey[key]) this.execute(commandByKey[key], this.ui.selected);
   }
 
-  execute(command, index) {
+  async execute(command, index) {
+    if (this.state.turnBusy) return;
     const item = this.state.player.inventory[index];
     if (!item) return;
-    if (command === "Set") this.#setEquipment(item);
-    else if (command === "Unset") this.#unsetEquipment(item);
-    else if (command === "Put") {
-      this.state.items.push({ ...item, x: this.state.player.x, y: this.state.player.y, id: `put-${Math.random()}` });
-      this.#remove(index);
-      this.ui.log(`${item.name}を足元に置いた。`);
-      sortInventory(this.state.player.inventory);
-    } else if (command === "Pick") this.pickup();
-    else if (command === "Throw") this.#throw(item, index);
-    else if ((command === "Read" && item.kind === "Book") || command === "Use") this.#use(item, index);
-    this.refresh();
-    if (!this.state.ended) this.open();
+    const turnsBefore = this.state.player.turns;
+    this.state.turnBusy = true;
+    try {
+      if (command === "Set") this.#setEquipment(item);
+      else if (command === "Unset") this.#unsetEquipment(item);
+      else if (command === "Put") {
+        this.state.items.push({ ...item, x: this.state.player.x, y: this.state.player.y, id: `put-${Math.random()}` });
+        this.#remove(index);
+        this.ui.log(`${item.name}を足元に置いた。`);
+        sortInventory(this.state.player.inventory);
+      } else if (command === "Pick") this.pickup();
+      else if (command === "Throw") await this.#throw(item, index);
+      else if ((command === "Read" && item.kind === "Book") || command === "Use") await this.#use(item, index);
+      this.refresh();
+      if (this.state.ended) return;
+      if (this.state.player.turns > turnsBefore) this.ui.closeInventory();
+      else this.open();
+    } finally {
+      this.state.turnBusy = false;
+    }
   }
 
   #setEquipment(item) {
@@ -81,7 +91,7 @@ export class InventorySystem {
     this.ui.log(`${item.name}を外した。`);
   }
 
-  #use(item, index) {
+  async #use(item, index) {
     const { player } = this.state;
     if (item.effect === "heal") {
       const healed = Math.min(item.power, player.maxHp - player.hp);
@@ -89,31 +99,31 @@ export class InventorySystem {
       player.hp += healed;
       this.ui.log(`${item.name}を使い、HPが${healed}回復した。`);
       player.turns += 1;
-      this.combat.finishTurn();
+      await this.combat.finishTurn();
     } else if (item.effect === "attack" || item.effect === "defense") {
       const stat = item.effect === "attack" ? "bonusAttack" : "bonusDefense";
       player[stat] += item.power;
       this.ui.log(`${item.name}を使い、${item.effect === "attack" ? "攻撃" : "防御"}力が${item.power}上がった。`);
       player.turns += 1;
-      this.combat.finishTurn();
+      await this.combat.finishTurn();
     } else if (item.effect === "torch") {
       const restored = Math.min(item.power, CONFIG.startingTorch - player.torch);
       if (!restored) return this.ui.log("松明はまだ十分に燃えている。");
       player.torch += restored;
       this.ui.log(`${item.name}を使い、松明が${restored}回復した。`);
       player.turns += 1;
-      this.combat.finishTurn();
+      await this.combat.finishTurn();
     } else if (item.effect === "card") {
       return this.#throw(item, index);
     } else if (item.kind === "Arrow") {
       return this.ui.log("矢は弓を装備して攻撃すると自動で使用する。");
     } else if (item.effect === "blast" || item.effect === "ranged") {
-      if (!this.#hitTarget(item)) return;
+      if (!await this.#hitTarget(item)) return;
     } else return this.ui.log(`${item.name}は今は使えない。`);
     this.#remove(index);
   }
 
-  #hitTarget(item) {
+  async #hitTarget(item) {
     const { player, enemies } = this.state;
     const target = enemies.find((enemy) => {
       const dx = enemy.x - player.x;
@@ -131,28 +141,33 @@ export class InventorySystem {
     }
     target.hp -= Math.max(1, item.power + (item.effect === "ranged" ? player.attack : 0) - target.defense);
     this.ui.log(`${item.name}が${target.name}に命中した。`);
+    this.ui.shake("attack");
+    this.ui.update(this.state);
     if (target.hp <= 0) this.combat.defeat(target);
     player.turns += 1;
-    this.combat.finishTurn();
+    await this.combat.finishTurn();
     return true;
   }
 
-  #throw(item, index) {
+  async #throw(item, index) {
     if (item.kind === "Card") {
-      this.combat.throwCard(item);
+      await this.combat.throwCard(item);
       this.#remove(index);
       return;
     }
     const { player, enemies } = this.state;
     const target = enemies.find((enemy) =>
       enemy.x === player.x + player.facing.x && enemy.y === player.y + player.facing.y);
+    this.ui.shake("attack");
     if (!target) return this.ui.log(`${player.facing.angle}に投げる対象がいない。`);
     target.hp -= Math.max(1, item.power ?? 2);
     this.ui.log(`${item.name}を投げ、${target.name}に当てた。`);
+    this.ui.shake("attack");
+    this.ui.update(this.state);
     if (target.hp <= 0) this.combat.defeat(target);
     this.#remove(index);
     player.turns += 1;
-    this.combat.finishTurn();
+    await this.combat.finishTurn();
   }
 
   #remove(index) {

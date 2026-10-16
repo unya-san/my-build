@@ -42,7 +42,7 @@ export function createEnemies(database, dungeon, depth) {
   const occupied = new Set([`${dungeon.start.x},${dungeon.start.y}`, `${dungeon.exit.x},${dungeon.exit.y}`]);
   const perRoom = Math.min(
     CONFIG.maxEnemiesPerRoom,
-    CONFIG.enemyCountPerRoom + (depth - 1) * CONFIG.enemyCountPerDepth,
+    CONFIG.enemyCountPerRoom + Math.floor((depth - 1) / CONFIG.enemyDepthInterval) * CONFIG.enemyCountPerDepth,
   );
   const boss = database[database.length - 1];
   dungeon.rooms.forEach((room, roomIndex) => {
@@ -56,6 +56,7 @@ export function createEnemies(database, dungeon, depth) {
       occupied.add(`${position.x},${position.y}`);
       enemies.push({
         ...template,
+        name: enemyVariantName(template.name, variant),
         spriteRow: database.indexOf(template),
         id: `${depth}-${roomIndex}-${number}-${Math.random()}`,
         x: position.x,
@@ -77,11 +78,19 @@ export function createEnemies(database, dungeon, depth) {
 export function createItems(database, dungeon, depth) {
   const items = [];
   const count = randomInt(CONFIG.minItems, CONFIG.maxItems);
-  for (let index = 0; index < count; index += 1) {
+  const regularItems = database.filter((item) => item.kind !== "Torch");
+  const torches = database.filter((item) => item.kind === "Torch");
+  const torchCount = Math.min(randomInt(CONFIG.minTorchesPerFloor, CONFIG.maxTorchesPerFloor), count);
+  for (let index = 0; index < count - torchCount; index += 1) {
     const room = dungeon.rooms[randomInt(0, dungeon.rooms.length - 1)];
-    const item = chooseWeightedItem(database);
+    const item = chooseWeightedItem(regularItems);
     const position = findOpenCell(dungeon, room);
     items.push(createItemInstance(item, depth, position, `${depth}-item-${index}`));
+  }
+  for (let index = 0; index < torchCount; index += 1) {
+    const template = torches[randomInt(0, torches.length - 1)];
+    const room = dungeon.rooms[randomInt(0, dungeon.rooms.length - 1)];
+    items.push(createItemInstance(template, depth, findOpenCell(dungeon, room), `${depth}-torch-${index}`));
   }
   return items;
 }
@@ -105,7 +114,16 @@ export function chooseWeightedItem(database) {
 }
 
 function rarityWeight(item) {
+  if (item.kind === "Bow") return 8 * (CONFIG.itemRarityWeights[item.rarity] ?? CONFIG.itemRarityWeights.common);
+  if (item.kind === "Torch") return 5 * (CONFIG.itemRarityWeights[item.rarity] ?? CONFIG.itemRarityWeights.common);
   return CONFIG.itemRarityWeights[item.rarity] ?? CONFIG.itemRarityWeights.common;
+}
+
+function enemyVariantName(name, variant) {
+  if (variant === 0) return name;
+  if (name === "ミミック" && variant === 2) return "ミミックライト";
+  const colors = ["", "グリーン", "ブルー", "パープル"];
+  return `${colors[variant]}${name}`;
 }
 
 function findOpenCell(dungeon, room, occupied = new Set()) {

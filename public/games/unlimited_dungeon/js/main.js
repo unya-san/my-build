@@ -10,7 +10,7 @@ import { InventorySystem } from "./inventory.js";
 const canvas = document.querySelector("#game-canvas");
 const renderer = new Renderer(canvas);
 const ui = new GameUI();
-const state = { depth: 1, dungeon: null, player: null, enemies: [], items: [], ended: false, inventoryOpen: false };
+const state = { depth: 1, dungeon: null, player: null, enemies: [], items: [], ended: false, inventoryOpen: false, turnBusy: false };
 const heldKeys = new Set();
 let enemyDatabase;
 let itemDatabase;
@@ -38,11 +38,12 @@ function resetRun() {
   state.depth = 1;
   state.ended = false;
   state.inventoryOpen = false;
+  state.turnBusy = false;
   state.dungeon = new Dungeon(state.depth);
   state.player = new Player(state.dungeon.start);
   state.enemies = createEnemies(enemyDatabase, state.dungeon, state.depth);
   state.items = createItems(itemDatabase, state.dungeon, state.depth);
-  ui.messages = [];
+  ui.clearLog();
   ui.log("勇者は無限に続く地下迷宮へ足を踏み入れた。");
   ui.log("部屋に入ると、その部屋の地図が明らかになる。");
   inventory.pickup();
@@ -63,12 +64,11 @@ function handleKeyDown(event) {
   const key = event.key.toLowerCase();
   if ([" ", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) event.preventDefault();
   heldKeys.add(key);
-  if (state.ended) return;
+  if (state.ended || state.turnBusy) return;
   if (state.inventoryOpen) return inventory.handleKey(key);
   if (key === "i" || key === "escape") return inventory.open();
   if (key === " " || key === "spacebar") {
-    combat.attack();
-    return refresh();
+    return runTurn(() => combat.attack());
   }
   const direction = getPressedDirection(key);
   if (direction) moveOrTurn(direction, event.shiftKey || heldKeys.has("shift"));
@@ -77,8 +77,8 @@ function handleKeyDown(event) {
 function getPressedDirection(key) {
   const horizontal = Number(heldKeys.has("d")) - Number(heldKeys.has("a"));
   const vertical = Number(heldKeys.has("s")) - Number(heldKeys.has("w"));
+  if (["q", "e", "z", "c"].includes(key)) return DIRECTIONS[key];
   if (horizontal === 0 && vertical === 0) {
-    if (key === "z") return null;
     return DIRECTIONS[key] ?? null;
   }
   return { x: horizontal, y: vertical, angle: directionName(horizontal, vertical) };
@@ -107,15 +107,29 @@ function moveOrTurn(direction, fast) {
     ui.log("行く手を阻まれている。");
     return;
   }
-  state.player.x = next.x;
-  state.player.y = next.y;
-  state.dungeon.revealAround(next.x, next.y, CONFIG.playerViewRadius);
-  state.player.turns += 1;
-  inventory.pickup();
-  combat.finishTurn();
-  if (!state.ended && state.player.x === state.dungeon.exit.x &&
-    state.player.y === state.dungeon.exit.y) descend();
-  refresh();
+  runTurn(async () => {
+    state.player.x = next.x;
+    state.player.y = next.y;
+    state.dungeon.revealAround(next.x, next.y, CONFIG.playerViewRadius);
+    state.player.turns += 1;
+    inventory.pickup();
+    await combat.finishTurn();
+    if (!state.ended && state.player.x === state.dungeon.exit.x &&
+      state.player.y === state.dungeon.exit.y) descend();
+  });
+}
+
+function runTurn(action) {
+  if (state.turnBusy) return;
+  state.turnBusy = true;
+  Promise.resolve()
+    .then(action)
+    .then(refresh)
+    .catch((error) => {
+      console.error(error);
+      ui.log(`行動を完了できませんでした：${error.message}`);
+    })
+    .finally(() => { state.turnBusy = false; });
 }
 
 function descend() {
